@@ -16,14 +16,14 @@
     const canvas = document.getElementById('game');
     const ctx    = canvas.getContext('2d');
 
-    // lista de imagens a carregar
+    // assets, agora com caminho dentro de /imagens
     const assets = {
-      bg:       { src: 'background.png', img: new Image() },
-      player:   { src: 'player.png',     img: new Image() },
+      bg:     { src: 'imagens/background.png', img: new Image() },
+      player: { src: 'imagens/player.png',     img: new Image() },
       platforms:[
-        { src: 'platform1.png', img: new Image() },
-        { src: 'platform2.png', img: new Image() },
-        { src: 'platform3.png', img: new Image() },
+        { src: 'imagens/platform1.png', img: new Image() },
+        { src: 'imagens/platform2.png', img: new Image() },
+        { src: 'imagens/platform3.png', img: new Image() },
       ]
     };
 
@@ -37,39 +37,40 @@
       { x: 680, y: 260, idx: 2 }
     ];
 
-    // player fixo no canto esquerdo, ajusta se quiser animação depois
+    // player fixo no canto esquerdo
     const playerPos = { x: 20, y: 300 };
 
-    // carregamento simples
+    // lista todas as imagens para pré-load
+    const allImages = [
+      assets.bg.img,
+      assets.player.img,
+      ...assets.platforms.map(pl => pl.img)
+    ];
+
     let loaded = 0;
-    const total = 1 + 1 + assets.platforms.length; // bg + player + plataformas
-
-    function checkAllLoaded() {
-      loaded++;
-      if (loaded === total) {
-        // assim que tudo carregar, dimensiona o canvas e desenha
-        canvas.width  = assets.bg.img.width;
-        canvas.height = assets.bg.img.height;
-        drawScene();
-      }
-    }
-
-    // seta onload e src para cada asset
-    assets.bg.img.onload       = checkAllLoaded;
-    assets.bg.img.src          = assets.bg.src;
-    assets.player.img.onload   = checkAllLoaded;
-    assets.player.img.src      = assets.player.src;
-    assets.platforms.forEach(pl=>{
-      pl.img.onload = checkAllLoaded;
-      pl.img.src    = pl.src;
+    allImages.forEach(img => {
+      img.onload = () => {
+        loaded++;
+        if (loaded === allImages.length) {
+          // só desenha quando tudo carregar
+          canvas.width  = assets.bg.img.width;
+          canvas.height = assets.bg.img.height;
+          drawScene();
+        }
+      };
     });
+
+    // dispara o carregamento
+    assets.bg.img.src    = assets.bg.src;
+    assets.player.img.src= assets.player.src;
+    assets.platforms.forEach(pl => pl.img.src = pl.src);
 
     function drawScene() {
       // 1) fundo
       ctx.drawImage(assets.bg.img, 0, 0);
 
       // 2) plataformas
-      platforms.forEach(p=>{
+      platforms.forEach(p => {
         const spr = assets.platforms[p.idx].img;
         ctx.drawImage(spr, p.x, p.y);
       });
