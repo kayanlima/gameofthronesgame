@@ -16,18 +16,23 @@
     const canvas = document.getElementById('game');
     const ctx    = canvas.getContext('2d');
 
-    // assets, agora com caminho dentro de /imagens
+    // 1) configurações do player
+    const playerSize   = { w: 64, h: 64 }; // tamanho em px no canvas
+    const playerOffset = 16;               // margem até a plataforma
+    const playerPos    = { x: 20, y: 0 };  // y será calculado depois
+
+    // 2) assets (com caminhos dentro de /imagens)
     const assets = {
       bg:     { src: 'imagens/background.png', img: new Image() },
       player: { src: 'imagens/player.png',     img: new Image() },
-      platforms:[
+      platforms: [
         { src: 'imagens/platform1.png', img: new Image() },
         { src: 'imagens/platform2.png', img: new Image() },
         { src: 'imagens/platform3.png', img: new Image() },
       ]
     };
 
-    // posições e qual sprite usar em cada plataforma
+    // 3) posições das plataformas e qual sprite usar (idx)
     const platforms = [
       { x:  80, y: 300, idx: 0 },
       { x: 200, y: 260, idx: 1 },
@@ -37,10 +42,7 @@
       { x: 680, y: 260, idx: 2 }
     ];
 
-    // player fixo no canto esquerdo
-    const playerPos = { x: 20, y: 300 };
-
-    // lista todas as imagens para pré-load
+    // 4) lista de todas as imagens para pré-load
     const allImages = [
       assets.bg.img,
       assets.player.img,
@@ -52,32 +54,40 @@
       img.onload = () => {
         loaded++;
         if (loaded === allImages.length) {
-          // só desenha quando tudo carregar
+          // redimensiona o canvas ao tamanho do fundo
           canvas.width  = assets.bg.img.width;
           canvas.height = assets.bg.img.height;
+          // calcula y do player para ficar no "chão"
+          playerPos.y = canvas.height - playerSize.h - playerOffset;
           drawScene();
         }
       };
     });
 
-    // dispara o carregamento
-    assets.bg.img.src    = assets.bg.src;
-    assets.player.img.src= assets.player.src;
+    // 5) dispara o carregamento das imagens
+    assets.bg.img.src      = assets.bg.src;
+    assets.player.img.src  = assets.player.src;
     assets.platforms.forEach(pl => pl.img.src = pl.src);
 
+    // 6) desenha a cena
     function drawScene() {
-      // 1) fundo
+      // Fundo
       ctx.drawImage(assets.bg.img, 0, 0);
 
-      // 2) plataformas
+      // Plataformas
       platforms.forEach(p => {
         const spr = assets.platforms[p.idx].img;
         ctx.drawImage(spr, p.x, p.y);
       });
 
-      // 3) player
-      ctx.drawImage(assets.player.img, playerPos.x, playerPos.y);
+      // Player (escalado)
+      ctx.drawImage(
+        assets.player.img,
+        playerPos.x, playerPos.y,
+        playerSize.w, playerSize.h
+      );
     }
   </script>
 </body>
 </html>
+
