@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meu Jogo</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { overflow:hidden; }
+    canvas { display:block; background:#000; }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx    = canvas.getContext('2d');
+
+    // lista de imagens a carregar
+    const assets = {
+      bg:       { src: 'background.png', img: new Image() },
+      player:   { src: 'player.png',     img: new Image() },
+      platforms:[
+        { src: 'platform1.png', img: new Image() },
+        { src: 'platform2.png', img: new Image() },
+        { src: 'platform3.png', img: new Image() },
+      ]
+    };
+
+    // posições e qual sprite usar em cada plataforma
+    const platforms = [
+      { x:  80, y: 300, idx: 0 },
+      { x: 200, y: 260, idx: 1 },
+      { x: 320, y: 220, idx: 2 },
+      { x: 440, y: 180, idx: 0 },
+      { x: 560, y: 220, idx: 1 },
+      { x: 680, y: 260, idx: 2 }
+    ];
+
+    // player fixo no canto esquerdo, ajusta se quiser animação depois
+    const playerPos = { x: 20, y: 300 };
+
+    // carregamento simples
+    let loaded = 0;
+    const total = 1 + 1 + assets.platforms.length; // bg + player + plataformas
+
+    function checkAllLoaded() {
+      loaded++;
+      if (loaded === total) {
+        // assim que tudo carregar, dimensiona o canvas e desenha
+        canvas.width  = assets.bg.img.width;
+        canvas.height = assets.bg.img.height;
+        drawScene();
+      }
+    }
+
+    // seta onload e src para cada asset
+    assets.bg.img.onload       = checkAllLoaded;
+    assets.bg.img.src          = assets.bg.src;
+    assets.player.img.onload   = checkAllLoaded;
+    assets.player.img.src      = assets.player.src;
+    assets.platforms.forEach(pl=>{
+      pl.img.onload = checkAllLoaded;
+      pl.img.src    = pl.src;
+    });
+
+    function drawScene() {
+      // 1) fundo
+      ctx.drawImage(assets.bg.img, 0, 0);
+
+      // 2) plataformas
+      platforms.forEach(p=>{
+        const spr = assets.platforms[p.idx].img;
+        ctx.drawImage(spr, p.x, p.y);
+      });
+
+      // 3) player
+      ctx.drawImage(assets.player.img, playerPos.x, playerPos.y);
+    }
+  </script>
+</body>
+</html>
