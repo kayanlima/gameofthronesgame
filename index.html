@@ -2,92 +2,452 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Meu Jogo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jaciara Baby & Kids</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { overflow:hidden; }
-    canvas { display:block; background:#000; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Fredoka',sans-serif; }
+    body { background:#fffaf5; color:#6A2E98; }
+    header { background:#fff; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #F99F38; flex-wrap:wrap; }
+    .logo { height:50px; }
+    nav { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    nav a { text-decoration:none; color:#6A2E98; font-weight:600; font-size:14px; cursor:pointer; }
+    nav a.active { color:#EF5FA2; }
+    .cart-icon { font-size:20px; color:#6A2E98; cursor:pointer; margin-left:8px; }
+
+    /* Banner */
+    .banner { background:linear-gradient(90deg,#F99F38 0%,#EC74A7 100%); text-align:center; padding:40px 20px; }
+    .banner h1 { color:#fff; font-size:32px; margin-bottom:10px; }
+    .banner p { color:#fff; font-size:18px; margin-bottom:20px; }
+    .banner button { background:#F99F38; color:#fff; border:none; padding:10px 20px; border-radius:30px; font-size:16px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
+    .banner button:hover { background:#EC74A7; }
+
+    /* Carousel of category icons */
+    .carousel-icons { background:#D1F0F7; overflow:hidden; padding:15px 0; }
+    .carousel-inner { display:flex; width:max-content; }
+    .carousel-item { flex:0 0 25%; text-align:center; padding:0 10px; }
+    .icon-circle { width:60px; height:60px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.1); margin:0 auto 8px; }
+    .icon-circle i { font-size:24px; color:#EC74A7; }
+    .carousel-item span { font-size:13px; color:#6A2E98; display:block; }
+
+    /* Sections Titles */
+    .section-title { font-size:24px; color:#EF5FA2; text-align:center; margin:30px 0 15px; }
+
+    /* Slider Section */
+    .slider-section { position:relative; padding:0 20px 40px; }
+    .slider-container { overflow:hidden; }
+    .slider-inner { display:flex; transition:transform 0.5s ease-in-out; }
+    .slider-item { flex:0 0 33.333%; padding:0 10px; }
+    .produto-card { background:#fff; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05); padding:12px; text-align:center; display:flex; flex-direction:column; justify-content:space-between; height:320px; }
+    .produto-card img { max-width:100%; border-radius:8px; height:160px; object-fit:cover; margin-bottom:10px; }
+    .produto-card h3 { font-size:18px; color:#6A2E98; margin:8px 0 5px; }
+    .produto-card p { font-size:14px; color:#505050; flex-grow:1; margin-bottom:8px; }
+    .price { font-weight:bold; color:#333; margin-bottom:10px; }
+    .add-cart { background:#F4A72B; color:#fff; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-size:14px; }
+    .edit-btn, .delete-btn { background:transparent; border:none; cursor:pointer; font-size:18px; margin:0 4px; }
+    .edit-btn { color:#F4A72B; }
+    .delete-btn { color:#E74C3C; }
+    .btn-group { display:flex; justify-content:center; margin-top:8px; }
+
+    .slider-nav { position:absolute; top:50%; transform:translateY(-50%); width:40px; height:40px; background:rgba(0,0,0,0.5); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#fff; }
+    .slider-prev { left:10px; }
+    .slider-next { right:10px; }
+
+    /* Modal Styles */
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); justify-content:center; align-items:center; z-index:1000; }
+    .modal.open { display:flex; }
+    .modal-content { background:#fefefe; padding:20px; border-radius:8px; max-width:90%; width:350px; position:relative; }
+    .modal-content h2 { margin-bottom:12px; color:#EF5FA2; font-size:22px; }
+    .modal-content input, .modal-content textarea, .modal-content select, .modal-content button { width:100%; margin:8px 0; padding:8px; font-size:14px; }
+    select { border:1px solid #ccc; border-radius:4px; }
+    .close { position:absolute; top:8px; right:10px; font-size:24px; font-weight:bold; cursor:pointer; color:#aaa; }
+    .close:hover { color:#000; }
+    .primary { background:#F99F38; color:#fff; border:none; padding:10px; border-radius:4px; cursor:pointer; font-size:16px; }
+    .primary:hover { background:#EC74A7; }
+
+    /* Cart Modal */
+    #cart-items { max-height:200px; overflow-y:auto; margin-bottom:12px; }
+    .cart-item { display:flex; align-items:center; margin-bottom:8px; }
+    .cart-item img { width:40px; height:40px; object-fit:cover; border-radius:4px; margin-right:8px; }
+    .cart-item span { flex:1; font-size:14px; }
+    .cart-item button { background:transparent; border:none; color:#E74C3C; cursor:pointer; font-size:18px; }
+
+    /* Admin product list */
+    #admin-produtos { margin-top:12px; max-height:200px; overflow-y:auto; }
+    .admin-item { display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ddd; border-radius:4px; padding:8px; margin-bottom:6px; font-size:14px; }
+    .admin-item span { flex:1; }
+    .admin-item button { margin-left:6px; padding:6px 8px; border:none; border-radius:4px; cursor:pointer; font-size:14px; }
+    .admin-edit { background:#F4A72B; color:#fff; }
+    .admin-delete { background:#fff; color:#E74C3C; border:1px solid #E74C3C; }
+
+    /* Footer bar */
+    footer { text-align:center; font-size:12px; padding:15px; background:#FDE6F2; color:#6A2E98; }
+
+    /* Responsive adjustments */
+    @media(max-width:900px) { .slider-item { flex:0 0 50%; } }
+    @media(max-width:600px) {
+      header { flex-direction:column; align-items:flex-start; }
+      nav { flex-direction:column; width:100%; }
+      nav a { font-size:12px; margin:6px 0; }
+      .banner h1 { font-size:24px; }
+      .banner p { font-size:14px; }
+      .carousel-item { flex:0 0 33.33%; }
+      .slider-item { flex:0 0 100%; padding:0 4px; }
+      .slider-nav { width:30px; height:30px; }
+      .produto-card { height:auto; }
+      .slider-item img { height:100px; }
+    }
   </style>
 </head>
 <body>
-  <canvas id="game"></canvas>
-  <script>
-    const canvas = document.getElementById('game');
-    const ctx    = canvas.getContext('2d');
+  <header>
+    <img src="logo-jaciara.png" alt="Jaciara Baby & Kids" class="logo">
+    <nav>
+      <a href="kit-berco.html">Kit Berço</a>
+      <a href="roupas.html">Roupas</a>
+      <a href="alimentacao.html">Alimentação</a>
+      <a href="brinquedos.html">Brinquedos</a>
+      <a href="ofertas.html">Ofertas</a>
+      <a href="#" id="admin-link">Admin</a>
+      <i class="fas fa-shopping-cart cart-icon" id="cart-link" title="Carrinho"></i>
+    </nav>
+  </header>
 
-    // 1) configurações do player
-    const playerSize   = { w: 64, h: 64 }; // tamanho em px no canvas
-    const playerOffset = 16;               // margem até a plataforma
-    const playerPos    = { x: 20, y: 0 };  // y será calculado depois
+  <!-- Banner principal -->
+  <section class="banner">
+    <h1>Novidades Jaciara Baby & Kids</h1>
+    <p>Venha conferir a nova coleção Pituchinhus!</p>
+    <button>Clique aqui e confira</button>
+  </section>
 
-    // 2) assets (com caminhos dentro de /imagens)
-    const assets = {
-      bg:     { src: 'imagens/background.png', img: new Image() },
-      player: { src: 'imagens/player.png',     img: new Image() },
-      platforms: [
-        { src: 'imagens/platform1.png', img: new Image() },
-        { src: 'imagens/platform2.png', img: new Image() },
-        { src: 'imagens/platform3.png', img: new Image() },
-      ]
-    };
+  <!-- Carrossel de ícones de categorias -->
+  <section class="carousel-icons">
+    <div class="carousel-inner" id="carousel-icons-inner">
+      <div class="carousel-item">
+        <div class="icon-circle"><i class="fas fa-tshirt"></i></div>
+        <span>Roupas</span>
+      </div>
+      <div class="carousel-item">
+        <div class="icon-circle"><i class="fas fa-utensils"></i></div>
+        <span>Alimentação</span>
+      </div>
+      <div class="carousel-item">
+        <div class="icon-circle"><i class="fas fa-gamepad"></i></div>
+        <span>Brinquedos</span>
+      </div>
+      <div class="carousel-item">
+        <div class="icon-circle"><i class="fas fa-star"></i></div>
+        <span>Ofertas</span>
+      </div>
+      <div class="carousel-item">
+        <div class="icon-circle"><i class="fas fa-couch"></i></div>
+        <span>Kit Berço</span>
+      </div>
+      <!-- cópias para loop -->
+      <div class="carousel-item">
+        <div class="icon-circle"><i class="fas fa-tshirt"></i></div>
+        <span>Roupas</span>
+      </div>
+      <div class="carousel-item">
+        <div class="icon-circle"><i class="fas fa-utensils"></i></div>
+        <span>Alimentação</span>
+      </div>
+    </div>
+  </section>
 
-    // 3) posições das plataformas e qual sprite usar (idx)
-    const platforms = [
-      { x:  80, y: 300, idx: 0 },
-      { x: 200, y: 260, idx: 1 },
-      { x: 320, y: 220, idx: 2 },
-      { x: 440, y: 180, idx: 0 },
-      { x: 560, y: 220, idx: 1 },
-      { x: 680, y: 260, idx: 2 }
-    ];
+  <!-- Seção Novidades -->
+  <div class="slider-section">
+    <h2 class="section-title">Novidades</h2>
+    <div class="slider-container">
+      <div class="slider-inner" id="novidades-slider"></div>
+    </div>
+    <div class="slider-nav slider-prev" id="prev-novidades"><i class="fas fa-chevron-left"></i></div>
+    <div class="slider-nav slider-next" id="next-novidades"><i class="fas fa-chevron-right"></i></div>
+  </div>
 
-    // 4) lista de todas as imagens para pré-load
-    const allImages = [
-      assets.bg.img,
-      assets.player.img,
-      ...assets.platforms.map(pl => pl.img)
-    ];
+  <!-- Seção Destaques -->
+  <div class="slider-section">
+    <h2 class="section-title">Destaques</h2>
+    <div class="slider-container">
+      <div class="slider-inner" id="destaques-slider"></div>
+    </div>
+    <div class="slider-nav slider-prev" id="prev-destaques"><i class="fas fa-chevron-left"></i></div>
+    <div class="slider-nav slider-next" id="next-destaques"><i class="fas fa-chevron-right"></i></div>
+  </div>
 
-    let loaded = 0;
-    allImages.forEach(img => {
-      img.onload = () => {
-        loaded++;
-        if (loaded === allImages.length) {
-          // redimensiona o canvas ao tamanho do fundo
-          canvas.width  = assets.bg.img.width;
-          canvas.height = assets.bg.img.height;
-          // calcula y do player para ficar no "chão"
-          playerPos.y = canvas.height - playerSize.h - playerOffset;
-          drawScene();
-        }
+  <!-- Modal Login Admin -->
+  <div id="login-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" data-close="login-modal">&times;</span>
+      <h2>Login Admin</h2>
+      <input id="username" placeholder="Usuário">
+      <input id="password" type="password" placeholder="Senha">
+      <button class="primary" id="login-btn">Entrar</button>
+    </div>
+  </div>
+
+  <!-- Modal Painel Admin -->
+  <div id="admin-panel" class="modal">
+    <div class="modal-content">
+      <span class="close" data-close="admin-panel">&times;</span>
+      <h2>Painel Admin</h2>
+      <input id="prod-id" type="hidden">
+      <input id="prod-name" placeholder="Nome do Produto">
+      <input id="prod-img" placeholder="URL da Imagem">
+      <input id="prod-price" placeholder="Preço (ex: 99.90)">
+      <textarea id="prod-desc" rows="3" placeholder="Descrição"></textarea>
+      <select id="prod-section">
+        <option value="novidade">Novidade</option>
+        <option value="destaque">Destaque</option>
+      </select>
+      <button class="primary" id="save-prod">Salvar Produto</button>
+      <div id="admin-produtos"></div>
+    </div>
+  </div>
+
+  <!-- Modal Carrinho -->
+  <div id="cart-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" data-close="cart-modal">&times;</span>
+      <h2>Carrinho de Compras</h2>
+      <div id="cart-items"></div>
+      <button class="primary" id="checkout-btn">Finalizar Compra</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    Projeto de exemplo para a loja Jaciara Baby & Kids.<br>
+    Todos os direitos reservados.
+  </footer>
+
+<script>
+  // Estado inicial
+  let products = JSON.parse(localStorage.getItem('products')) || [];
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  let isAdmin = false;
+
+  // Renderiza sliders Novidades e Destaques
+  function renderSliders() {
+    const novInner = document.getElementById('novidades-slider');
+    const destInner = document.getElementById('destaques-slider');
+    novInner.innerHTML = '';
+    destInner.innerHTML = '';
+    products.forEach((p, i) => {
+      const item = document.createElement('div');
+      item.className = 'slider-item';
+      const btns = isAdmin ?
+        `<button class=\"edit-btn\" data-index=\"${i}\">✎</button>
+         <button class=\"delete-btn\" data-index=\"${i}\">🗑</button>` : '';
+      const html = `
+        <div class=\"produto-card\">
+          <img src=\"${p.img}\" alt=\"${p.name}\">
+          <h3>${p.name}</h3>
+          <p>${p.desc}</p>
+          <div class=\"price\">R$ ${parseFloat(p.price).toFixed(2)}</div>
+          <div class=\"btn-group\">
+            ${btns}
+            <button class=\"add-cart\" data-index=\"${i}\">+ Carrinho</button>
+          </div>
+        </div>
+      `;
+      item.innerHTML = html;
+      if (p.section === 'novidade') novInner.appendChild(item);
+      if (p.section === 'destaque') destInner.appendChild(item.cloneNode(true));
+    });
+    attachProductListeners();
+  }
+
+  // Anexa listeners aos botões de produtos
+  function attachProductListeners() {
+    document.querySelectorAll('.add-cart').forEach(btn => {
+      btn.onclick = () => {
+        const prod = products[btn.dataset.index];
+        cart.push(prod);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
       };
     });
-
-    // 5) dispara o carregamento das imagens
-    assets.bg.img.src      = assets.bg.src;
-    assets.player.img.src  = assets.player.src;
-    assets.platforms.forEach(pl => pl.img.src = pl.src);
-
-    // 6) desenha a cena
-    function drawScene() {
-      // Fundo
-      ctx.drawImage(assets.bg.img, 0, 0);
-
-      // Plataformas
-      platforms.forEach(p => {
-        const spr = assets.platforms[p.idx].img;
-        ctx.drawImage(spr, p.x, p.y);
+    if (isAdmin) {
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.onclick = () => {
+          products.splice(btn.dataset.index, 1);
+          localStorage.setItem('products', JSON.stringify(products));
+          renderSliders(); renderAdminList();
+        };
       });
-
-      // Player (escalado)
-      ctx.drawImage(
-        assets.player.img,
-        playerPos.x, playerPos.y,
-        playerSize.w, playerSize.h
-      );
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.onclick = () => {
+          const idx = btn.dataset.index;
+          const p = products[idx];
+          document.getElementById('prod-id').value = idx;
+          document.getElementById('prod-name').value = p.name;
+          document.getElementById('prod-img').value = p.img;
+          document.getElementById('prod-price').value = p.price;
+          document.getElementById('prod-desc').value = p.desc;
+          document.getElementById('prod-section').value = p.section;
+          openModal('admin-panel');
+        };
+      });
     }
-  </script>
+  }
+
+  // Renderiza lista de produtos no painel admin
+  function renderAdminList() {
+    const list = document.getElementById('admin-produtos'); list.innerHTML = '';
+    products.forEach((p, i) => {
+      const div = document.createElement('div'); div.className = 'admin-item';
+      div.innerHTML = `<span>${p.name} - R$ ${parseFloat(p.price).toFixed(2)}</span>
+                       <button class=\"admin-edit\" data-index=\"${i}\">Editar</button>
+                       <button class=\"admin-delete\" data-index=\"${i}\">Excluir</button>`;
+      list.appendChild(div);
+    });
+    document.querySelectorAll('.admin-delete').forEach(btn => {
+      btn.onclick = () => {
+        products.splice(btn.dataset.index, 1);
+        localStorage.setItem('products', JSON.stringify(products));
+        renderSliders(); renderAdminList();
+      };
+    });
+    document.querySelectorAll('.admin-edit').forEach(btn => {
+      btn.onclick = () => {
+        const idx = btn.dataset.index;
+        const p = products[idx];
+        document.getElementById('prod-id').value = idx;
+        document.getElementById('prod-name').value = p.name;
+        document.getElementById('prod-img').value = p.img;
+        document.getElementById('prod-price').value = p.price;
+        document.getElementById('prod-desc').value = p.desc;
+        document.getElementById('prod-section').value = p.section;
+        openModal('admin-panel');
+      };
+    });
+  }
+
+  // Renderiza carrinho
+  function renderCart() {
+    const cont = document.getElementById('cart-items'); cont.innerHTML = '';
+    cart.forEach((item, i) => {
+      const div = document.createElement('div'); div.className = 'cart-item';
+      div.innerHTML = `<img src=\"${item.img}\" alt=\"${item.name}\">
+                       <span>${item.name} - R$ ${parseFloat(item.price).toFixed(2)}</span>
+                       <button class=\"remove-cart\" data-index=\"${i}\">&#x1F5D1;</button>`;
+      cont.appendChild(div);
+    });
+    document.querySelectorAll('.remove-cart').forEach(btn => {
+      btn.onclick = () => {
+        cart.splice(btn.dataset.index, 1);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+      };
+    });
+  }
+
+  // Abre modal
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  // Fecha todos os modais
+  function closeAll() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('open')); }
+
+  // Eventos de abertura de modais
+  document.getElementById('admin-link').onclick = () => openModal('login-modal');
+  document.getElementById('cart-link').onclick = () => openModal('cart-modal');
+  document.querySelectorAll('.close').forEach(btn => btn.onclick = () => closeAll());
+  window.onclick = e => { if (e.target.classList.contains('modal')) closeAll(); };
+
+  // Lógica de login admin
+  document.getElementById('login-btn').onclick = () => {
+    const u = document.getElementById('username').value;
+    const p = document.getElementById('password').value;
+    if (u === 'admin' && p === 'senha123') {
+      isAdmin = true;
+      closeAll();
+      openModal('admin-panel');
+      renderSliders();
+      renderAdminList();
+    } else {
+      alert('Credenciais inválidas');
+    }
+  };
+
+  // Salvar ou editar produto
+  document.getElementById('save-prod').onclick = () => {
+    const idx = document.getElementById('prod-id').value;
+    const name = document.getElementById('prod-name').value.trim();
+    const img = document.getElementById('prod-img').value.trim();
+    const price = document.getElementById('prod-price').value.trim();
+    const desc = document.getElementById('prod-desc').value.trim();
+    const section = document.getElementById('prod-section').value;
+    if (name && img && price && desc) {
+      if (idx !== '') {
+        products[idx] = { name, img, price, desc, section };
+      } else {
+        products.push({ name, img, price, desc, section });
+      }
+      localStorage.setItem('products', JSON.stringify(products));
+      closeAll();
+      renderSliders();
+      renderAdminList();
+      document.getElementById('prod-id').value = '';
+      document.getElementById('prod-name').value = '';
+      document.getElementById('prod-img').value = '';
+      document.getElementById('prod-price').value = '';
+      document.getElementById('prod-desc').value = '';
+    } else {
+      alert('Preencha todos os campos');
+    }
+  };
+
+  // Checkout via WhatsApp
+  document.getElementById('checkout-btn').onclick = () => {
+    if (cart.length === 0) { alert('Carrinho vazio'); return; }
+    let msg = 'Olá, gostaria de realizar o pedido:';
+    cart.forEach(item => {
+      msg += `\n- ${item.name} (R$ ${parseFloat(item.price).toFixed(2)})`;
+    });
+    const encoded = encodeURIComponent(msg);
+    const waNumber = '5583996138889';
+    window.open(`https://wa.me/${waNumber}?text=${encoded}`, '_blank');
+    cart = [];
+    localStorage.setItem('cart', JSON.stringify(cart));
+    renderCart();
+    closeAll();
+  };
+
+  // Inicialização
+  renderSliders();
+  renderAdminList();
+  renderCart();
+
+  // Animação carrossel de ícones (rolagem contínua)
+  const iconsInner = document.getElementById('carousel-icons-inner');
+  let pos = 0;
+  function animateIcons() {
+    pos -= 1;
+    if (Math.abs(pos) >= iconsInner.scrollWidth / 2) pos = 0;
+    iconsInner.style.transform = `translateX(${pos}px)`;
+    requestAnimationFrame(animateIcons);
+  }
+  animateIcons();
+
+  // Controles dos sliders
+  function setupSlider(prevId, nextId, innerId) {
+    const prev = document.getElementById(prevId);
+    const next = document.getElementById(nextId);
+    const inner = document.getElementById(innerId);
+    let index = 0;
+    prev.onclick = () => {
+      index = Math.max(index - 1, 0);
+      inner.style.transform = `translateX(-${index * (100/3)}%)`;
+    };
+    next.onclick = () => {
+      const maxIdx = inner.children.length - 3;
+      index = Math.min(index + 1, maxIdx >= 0 ? maxIdx : 0);
+      inner.style.transform = `translateX(-${index * (100/3)}%)`;
+    };
+  }
+  setupSlider('prev-novidades', 'next-novidades', 'novidades-slider');
+  setupSlider('prev-destaques', 'next-destaques', 'destaques-slider');
+</script>
 </body>
 </html>
-
